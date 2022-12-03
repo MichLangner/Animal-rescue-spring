@@ -9,7 +9,12 @@ import io.github.michlangner.animalRescueSpring.domain.Specie;
 import io.github.michlangner.animalRescueSpring.infrastructure.AnimalService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -32,18 +37,26 @@ public class AnimalController {
     private final AnimalService animalService;
 
     @GetMapping(path = "/animals")
-    public AllAnimalsResponse getAnimals(@RequestParam(required = false, defaultValue = "3") Integer limit) {
-        AllAnimalsResponse animalsResponse = new AllAnimalsResponse(
-                animalService.listOfAnimals(limit));
-        return animalsResponse;
+    public ResponseEntity<Page<Animal>> getAnimals(@RequestParam(required = false, defaultValue = "3") Integer limit,
+                                                   @RequestParam Integer size,
+                                                   @RequestParam Integer page,
+                                                   @RequestParam(required = false,defaultValue = "age") String sort,
+                                                   @RequestParam(required = false,defaultValue = "DESC") String direction) {
+
+        Sort sortBy = Sort.by(Sort.Direction.fromString(direction),sort);
+        PageRequest of = PageRequest.of(page, size,sortBy);
+        return ResponseEntity.ok().body(animalService.listOfAnimals(of));
     }
 
     @GetMapping(path = "/animals/{id}")
-    public SingleAnimalResponse getById(@PathVariable String id) {
+    public ResponseEntity<Animal> getById(@PathVariable String id) {
         log.info(id);
-        return new SingleAnimalResponse(
-                animalService.singleAnimal(id).getAge(),
-                animalService.singleAnimal(id).getSpecie());
+        Animal singleAnimal = animalService.singleAnimal(id);
+        if (singleAnimal == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(singleAnimal);
+        }
     }
 
     @PutMapping(path = "/animals/{specie}/{id}")

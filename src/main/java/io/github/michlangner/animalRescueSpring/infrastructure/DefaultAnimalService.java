@@ -1,9 +1,10 @@
 package io.github.michlangner.animalRescueSpring.infrastructure;
 
 import io.github.michlangner.animalRescueSpring.domain.*;
-import io.github.michlangner.animalRescueSpring.repositories.AnimalsRepository;
+import io.github.michlangner.animalRescueSpring.repositories.AnimalsDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,23 +12,28 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-@Profile(value = "default")
 public class DefaultAnimalService implements AnimalService {
 
-    private final AnimalsRepository animalsRepository;
+    private final AnimalsDao animalsDao;
 
-    public DefaultAnimalService(AnimalsRepository animalRepository) {
-        this.animalsRepository = animalRepository;
+    public DefaultAnimalService(AnimalsDao animalRepository) {
+        this.animalsDao = animalRepository;
     }
 
     @Override
     public List<Animal> listOfAnimals(Integer limit) {
-        return animalsRepository.findAllAnimals(limit);
+        return animalsDao.findAllAnimals(limit);
     }
 
     @Override
+    public Page<Animal> listOfAnimals(Pageable pageable) {
+        return animalsDao.findAnimals(pageable);
+    }
+
+
+    @Override
     public Animal singleAnimal(String id) {
-        return animalsRepository.findAnimal(id);
+        return animalsDao.findAnimal(id);
     }
 
     @Override
@@ -59,19 +65,19 @@ public class DefaultAnimalService implements AnimalService {
 
         }
 
-        animalsRepository.saveAnimal(animal);
+        animalsDao.saveAnimal(animal);
         return animal;
     }
 
     @Override
     public boolean deleteAnimal(String id) {
-        animalsRepository.deleteAnimal(id);
+        animalsDao.deleteAnimal(id);
         log.info("Deleting animal by ID {}", id);
         return true;
     }
 
     @Override
     public boolean animalExist(String id) {
-        return animalsRepository.findAnimal(id) != null;
+        return animalsDao.findAnimal(id) != null;
     }
 }

@@ -1,13 +1,14 @@
 package io.github.michlangner.animalRescueSpring.repositories;
 
 import io.github.michlangner.animalRescueSpring.domain.Animal;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 
-public interface AnimalsRepository {
+@Repository
+public interface AnimalsRepository extends MongoRepository<Animal,String> {
 
-    void saveAnimal(Animal animal);
-    Animal findAnimal(String id);
-    List<Animal> findAllAnimals(Integer limit);
-    void deleteAnimal(String id);
+
+    public Animal findAnimalById(String id);
+    public void deleteById(String id);
 }

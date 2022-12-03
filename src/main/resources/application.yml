@@ -2,9 +2,22 @@ server:
   port: 8080
 
 spring:
-  mongodb:
-    embedded:
-      version: "4.0.21"
-
-  main:
-    banner-mode: off
+  data:
+    mongodb:
+      uri: mongodb+srv://Michal:nS4o9xbtp1ktyZpY@sda-training.t0rbegr.mongodb.net/?retryWrites=true&w=majority
+      database: sda_training
+#spring:
+#  mongodb:
+#    embedded:
+#      version: "4.0.21"
+#
+#  main:
+#    banner-mode: off
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: debug
